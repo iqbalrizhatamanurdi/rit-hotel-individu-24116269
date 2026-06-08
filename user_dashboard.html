@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>RIT Hotel Yogyakarta | Dashboard Tamu</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link href="css/polish.css" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; min-height: 100vh; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#000613",
+                        secondary: "#D4AF37",
+                        "secondary-dark": "#AA7C11",
+                        surface: "#F9FAFC",
+                        "on-surface-variant": "#64748B"
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface text-slate-800">
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const sampleBookings = [
+            { id: 101, guest_name: "John Doe", guest_email: "john@example.com", room_name: "Superior King Garden", check_in: "2026-05-28", check_out: "2026-05-30", total_price: 4870000, bank_name: "BCA", status: "Confirmed", created_at: "2026-05-20T10:00:00Z" },
+            { id: 102, guest_name: "John Doe", guest_email: "john@example.com", room_name: "Deluxe Malioboro View", check_in: "2026-06-15", check_out: "2026-06-17", total_price: 7745000, bank_name: "MANDIRI", status: "Pending", created_at: "2026-05-22T14:30:00Z" }
+        ];
+
+        function App() {
+            const [bookings, setBookings] = useState([]);
+            const [fullname, setFullname] = useState("");
+            const [email, setEmail] = useState("");
+            const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+            useEffect(() => {
+                if (localStorage.getItem("isLoggedIn") !== "true") {
+                    window.location.href = "login.html";
+                    return;
+                }
+                if (localStorage.getItem("role") === "admin") {
+                    window.location.href = "admin_dashboard.html";
+                    return;
+                }
+                setFullname(localStorage.getItem("fullname") || "Tamu VIP");
+                setEmail(localStorage.getItem("email") || "tamu@rithotel.id");
+
+                let stored = JSON.parse(localStorage.getItem("bookings_db") || "[]");
+                if (stored.length === 0) {
+                    localStorage.setItem("bookings_db", JSON.stringify(sampleBookings));
+                    stored = sampleBookings;
+                }
+                const name = localStorage.getItem("fullname") || "John Doe";
+                const mine = stored.filter(b => b.guest_name === name);
+                setBookings(mine.length > 0 ? mine : stored.slice(0, 3));
+            }, []);
+
+            const formatRupiah = (val) => 'Rp ' + new Intl.NumberFormat('id-ID').format(val);
+
+            const handleLogout = () => {
+                localStorage.removeItem("isLoggedIn");
+                localStorage.removeItem("user_id");
+                localStorage.removeItem("role");
+                localStorage.removeItem("fullname");
+                window.location.href = "index.html";
+            };
+
+            const pending = bookings.filter(b => b.status === "Pending").length;
+            const confirmed = bookings.filter(b => b.status === "Confirmed").length;
+
+            return (
+                <div className="flex flex-col min-h-screen">
+                    <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 md:px-12 py-4 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm">
+                        <div className="flex items-center gap-4">
+                            <button className="lg:hidden text-primary p-1" onClick={() => setMobileMenuOpen(true)}>
+                                <span className="material-symbols-outlined text-2xl">menu</span>
+                            </button>
+                            <a className="text-xl md:text-2xl font-bold tracking-wider text-primary flex items-center gap-2 font-serif" href="index.html">
+                                <span className="text-secondary">RIT</span><span> Hotel</span>
+                            </a>
+                        </div>
+                        <nav className="hidden lg:flex items-center gap-6 text-sm">
+                            <a className="font-medium text-on-surface-variant hover:text-secondary transition-colors" href="index.html">Beranda</a>
+                            <a className="font-medium text-on-surface-variant hover:text-secondary transition-colors" href="daftar_kamar.html">Kamar</a>
+                            <a className="font-semibold text-secondary border-b-2 border-secondary py-1" href="user_dashboard.html">Dashboard</a>
+                            <a className="font-medium text-on-surface-variant hover:text-secondary transition-colors" href="booking.html">Pesan Baru</a>
+                        </nav>
+                        <button onClick={handleLogout} className="text-red-500 hover:text-red-700 text-xs font-bold uppercase tracking-wider">Keluar</button>
+                    </header>
+
+                    {mobileMenuOpen && (
+                        <div className="fixed inset-0 z-[60] flex">
+                            <div className="absolute inset-0 bg-black/40" onClick={() => setMobileMenuOpen(false)}></div>
+                            <aside className="relative w-72 bg-white h-screen p-6 shadow-2xl animate-slide-in">
+                                <button className="absolute top-4 right-4" onClick={() => setMobileMenuOpen(false)}>
+                                    <span className="material-symbols-outlined">close</span>
+                                </button>
+                                <nav className="mt-12 flex flex-col gap-2 text-sm">
+                                    <a href="index.html" className="px-4 py-3 rounded-xl hover:bg-slate-50">Beranda</a>
+                                    <a href="daftar_kamar.html" className="px-4 py-3 rounded-xl hover:bg-slate-50">Kamar & Suite</a>
+                                    <a href="user_dashboard.html" className="px-4 py-3 rounded-xl bg-secondary/10 text-secondary font-bold">Dashboard Saya</a>
+                                    <a href="booking.html" className="px-4 py-3 rounded-xl bg-primary text-white font-bold text-center mt-4">Pesan Kamar</a>
+                                </nav>
+                            </aside>
+                        </div>
+                    )}
+
+                    <main className="flex-grow pt-24 md:pt-28 max-w-6xl mx-auto px-6 w-full pb-20 space-y-10">
+                        <div className="bg-primary text-white rounded-3xl p-8 md:p-10 relative overflow-hidden">
+                            <div className="absolute inset-0 opacity-20">
+                                <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1200" className="w-full h-full object-cover" alt="" />
+                            </div>
+                            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                <div className="space-y-2">
+                                    <span className="text-secondary text-xs font-bold uppercase tracking-widest">Selamat datang kembali</span>
+                                    <h1 className="font-serif text-2xl md:text-4xl font-bold">Hai, {fullname}</h1>
+                                    <p className="text-sm text-slate-300 font-light">Kelola reservasi Anda di jantung Yogyakarta — dekat Malioboro, Keraton, dan Bandara YIA.</p>
+                                </div>
+                                <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                                    <div className="w-14 h-14 rounded-full bg-secondary text-primary flex items-center justify-center font-bold text-xl">
+                                        {fullname.charAt(0)}
+                                    </div>
+                                    <div className="text-sm">
+                                        <p className="font-bold">{email}</p>
+                                        <p className="text-secondary text-xs font-semibold uppercase tracking-wider mt-1">Member Tamu VIP</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm card-premium flex items-center gap-4">
+                                <div className="p-3 rounded-xl bg-amber-50 text-secondary"><span className="material-symbols-outlined text-2xl">book_online</span></div>
+                                <div>
+                                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Booking</p>
+                                    <h4 className="text-2xl font-bold text-primary">{bookings.length}</h4>
+                                </div>
+                            </div>
+                            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm card-premium flex items-center gap-4">
+                                <div className="p-3 rounded-xl bg-emerald-50 text-emerald-600"><span className="material-symbols-outlined text-2xl">check_circle</span></div>
+                                <div>
+                                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Terkonfirmasi</p>
+                                    <h4 className="text-2xl font-bold text-primary">{confirmed}</h4>
+                                </div>
+                            </div>
+                            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm card-premium flex items-center gap-4">
+                                <div className="p-3 rounded-xl bg-orange-50 text-orange-600"><span className="material-symbols-outlined text-2xl">pending</span></div>
+                                <div>
+                                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Menunggu Verifikasi</p>
+                                    <h4 className="text-2xl font-bold text-primary">{pending}</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+                                <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+                                    <h3 className="font-bold text-sm uppercase tracking-wider text-primary">Riwayat Reservasi</h3>
+                                    <a href="booking.html" className="text-xs font-bold text-secondary hover:underline">+ Pesan Baru</a>
+                                </div>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-xs text-left min-w-[500px]">
+                                        <thead>
+                                            <tr className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider">
+                                                <th className="py-3 px-4">Kamar</th>
+                                                <th className="py-3 px-4">Check-In / Out</th>
+                                                <th className="py-3 px-4 text-right">Total</th>
+                                                <th className="py-3 px-4 text-center">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {bookings.map(b => (
+                                                <tr key={b.id} className="border-t border-slate-50 hover:bg-slate-50/50 transition-colors">
+                                                    <td className="py-4 px-4 font-semibold text-primary">{b.room_name}</td>
+                                                    <td className="py-4 px-4 text-slate-500">{b.check_in} → {b.check_out}</td>
+                                                    <td className="py-4 px-4 text-right font-bold text-secondary">
+                                                        {formatRupiah(b.total_price)}
+                                                        {b.promo_code && (
+                                                            <div className="text-[9px] text-emerald-600 font-bold mt-0.5">
+                                                                Kupon: {b.promo_code} (-{formatRupiah(b.discount_amount)})
+                                                            </div>
+                                                        )}
+                                                    </td>
+                                                    <td className="py-4 px-4 text-center">
+                                                        <span className={`px-2.5 py-1 rounded-full text-[9px] font-bold uppercase ${b.status === 'Confirmed' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>{b.status}</span>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4">
+                                    <h3 className="font-bold text-sm uppercase tracking-wider text-primary">Rekomendasi Wisata Jogja</h3>
+                                    <ul className="space-y-3 text-xs text-slate-600">
+                                        <li className="flex gap-3"><span className="material-symbols-outlined text-secondary text-sm">location_on</span><span><strong>Malioboro</strong> — 10 menit dari hotel</span></li>
+                                        <li className="flex gap-3"><span className="material-symbols-outlined text-secondary text-sm">castle</span><span><strong>Keraton Yogyakarta</strong> — budaya istimewa</span></li>
+                                        <li className="flex gap-3"><span className="material-symbols-outlined text-secondary text-sm">temple_hindu</span><span><strong>Candi Prambanan</strong> — paket tur hotel</span></li>
+                                        <li className="flex gap-3"><span className="material-symbols-outlined text-secondary text-sm">flight</span><span><strong>Bandara YIA</strong> — antar-jemput tersedia</span></li>
+                                        <li className="flex gap-3"><span className="material-symbols-outlined text-secondary text-sm">restaurant</span><span><strong>Gudeg Yu Djum</strong> — kuliner wajib coba</span></li>
+                                    </ul>
+                                </div>
+                                <a href="daftar_kamar.html" className="block w-full text-center bg-primary hover:bg-secondary text-white hover:text-primary py-4 rounded-2xl font-bold text-xs uppercase tracking-wider btn-premium shadow-md transition-all">
+                                    Jelajahi Kamar Premium
+                                </a>
+                            </div>
+                        </div>
+                    </main>
+
+                    <footer className="bg-primary text-white py-6 text-center text-[10px] text-slate-500">
+                        &copy; 2026 RIT Hotel Yogyakarta. Dashboard Tamu — Simulasi Frontend UTS.
+                    </footer>
+                </div>
+            );
+        }
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>

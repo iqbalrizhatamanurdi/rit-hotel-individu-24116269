@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>RIT Hotel Hotel Yogyakarta | Daftar Akun</title>
+    <!-- Tailwind CSS with Forms plugin -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <!-- Google Fonts Poppins & Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <!-- React & ReactDOM CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <!-- Babel CDN for JSX processing in browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#000613",
+                        secondary: "#D4AF37",
+                        "secondary-dark": "#AA7C11",
+                        surface: "#F9FAFC",
+                        "on-surface-variant": "#64748B"
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface text-slate-800">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        function App() {
+            const [username, setUsername] = useState("");
+            const [fullname, setFullname] = useState("");
+            const [email, setEmail] = useState("");
+            const [password, setPassword] = useState("");
+            const [successMsg, setSuccessMsg] = useState("");
+
+            const handleRegister = (e) => {
+                e.preventDefault();
+                
+                // Save simulated user details in localStorage
+                localStorage.setItem("fullname", fullname);
+                localStorage.setItem("username", username);
+                localStorage.setItem("email", email);
+                localStorage.setItem("role", "user");
+                localStorage.setItem("isLoggedIn", "true");
+                localStorage.setItem("user_id", String(Date.now()));
+
+                setSuccessMsg("Pendaftaran berhasil! Mengalihkan ke Dashboard Tamu...");
+                setTimeout(() => {
+                    window.location.href = "user_dashboard.html";
+                }, 1200);
+            };
+
+            return (
+                <div className="min-h-screen flex items-center justify-center bg-slate-950 px-6 relative overflow-hidden">
+                    <div className="absolute inset-0 z-0 opacity-20">
+                        <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=1920" className="w-full h-full object-cover" alt="Background" />
+                    </div>
+
+                    <div className="relative z-10 w-full max-w-md bg-white p-8 rounded-3xl border border-slate-100 shadow-2xl space-y-6">
+                        <div className="text-center space-y-2">
+                            <a href="index.html" className="text-3xl font-bold font-serif text-primary flex justify-center items-center gap-2">
+                                <span className="text-secondary">RIT</span><span> Hotel</span>
+                            </a>
+                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest font-sans">Daftar Keanggotaan Tamu VIP</p>
+                        </div>
+
+                        {successMsg && (
+                            <div className="bg-emerald-50 text-emerald-800 p-4 border-l-4 border-emerald-500 rounded-xl text-xs font-bold uppercase tracking-wider animate-pulse">
+                                {successMsg}
+                            </div>
+                        )}
+
+                        <form onSubmit={handleRegister} className="space-y-4 text-xs font-light">
+                            <div className="flex flex-col gap-1.5">
+                                <label className="text-[9px] font-bold uppercase tracking-widest text-slate-500">Nama Lengkap Anda</label>
+                                <input type="text" value={fullname} onChange={(e) => setFullname(e.target.value)} className="bg-slate-50 border-slate-100 rounded-xl px-4 py-3 outline-none focus:ring-1 focus:ring-secondary font-semibold" placeholder="Contoh: Jane Doe" required />
+                            </div>
+
+                            <div className="flex flex-col gap-1.5">
+                                <label className="text-[9px] font-bold uppercase tracking-widest text-slate-500">Nama Pengguna (Username)</label>
+                                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="bg-slate-50 border-slate-100 rounded-xl px-4 py-3 outline-none focus:ring-1 focus:ring-secondary font-semibold" placeholder="Contoh: janedoe" required />
+                            </div>
+
+                            <div className="flex flex-col gap-1.5">
+                                <label className="text-[9px] font-bold uppercase tracking-widest text-slate-500">Alamat Email</label>
+                                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-slate-50 border-slate-100 rounded-xl px-4 py-3 outline-none focus:ring-1 focus:ring-secondary font-semibold" placeholder="janedoe@example.com" required />
+                            </div>
+
+                            <div className="flex flex-col gap-1.5">
+                                <label className="text-[9px] font-bold uppercase tracking-widest text-slate-500">Kata Sandi (Password)</label>
+                                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="bg-slate-50 border-slate-100 rounded-xl px-4 py-3 outline-none focus:ring-1 focus:ring-secondary font-semibold" placeholder="••••••••" required />
+                            </div>
+
+                            <button type="submit" className="w-full bg-primary hover:bg-[#D4AF37] text-white hover:text-primary transition-all py-3.5 rounded-2xl font-bold uppercase tracking-wider shadow-md">
+                                Daftarkan Akun
+                            </button>
+                        </form>
+
+                        <div className="text-center text-[10px] text-slate-400 font-bold border-t pt-4">
+                            Sudah memiliki akun? <a href="login.html" className="text-secondary hover:underline">Masuk ke Akun</a>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
